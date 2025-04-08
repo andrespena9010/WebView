@@ -1,5 +1,8 @@
 package com.exaple.webwiew.ui.views
 
+import android.util.Log
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,9 +21,6 @@ fun WebViewCompose(
     viewModel: WebViewModelClass = WebViewModel
 ) {
 
-    /*var slideStart by remember { mutableFloatStateOf(0f) }
-    var slideEnd by remember { mutableFloatStateOf(0f) }*/
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -28,27 +28,12 @@ fun WebViewCompose(
         Box (
             modifier = Modifier
                 .padding( innerPaddings )
-                .fillMaxSize()
-                /*.pointerInput( Unit ){
-                    detectDragGestures(
-                        onDragStart = { offset ->
-                            slideStart = offset.x
-                            txt = offset.x.toString()
-                        },
-                        onDrag = { pointer, offset ->
-                            slideEnd += offset.x
-                            txt = offset.x.toString()
-                        },
-                        onDragEnd = {
-                            if ( slideEnd > 0 ) nav.popBackStack()
-                        }
-                    )
-                }*/,
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
             AndroidView(
-                factory = { context ->
-                    viewModel.go( context = context )
+                factory = { ctx ->
+                    viewModel.go( context = ctx )
                 }
             )
         }
