@@ -31,7 +31,7 @@ open class WebViewModelClass(): ViewModel(){
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    fun go( context: Context ): WebView {
+    fun getWebView( context: Context ): WebView {
 
         webView = WebView( context )
 
@@ -55,47 +55,19 @@ open class WebViewModelClass(): ViewModel(){
         }
 
         webView.settings.apply {
-
-            // Habilita JavaScript (desactivado por defecto por seguridad)
             javaScriptEnabled = true
-
-            // Usa un viewport "amplio", como un navegador de escritorio. Necesario para que el meta viewport funcione bien
             useWideViewPort = true
-
-            // Ajusta el contenido a la pantalla al cargar la página
             loadWithOverviewMode = true
-
-            // Permite el almacenamiento DOM (como localStorage)
             domStorageEnabled = true
-
-            // Permite el acceso a archivos locales (file:// URLs)
             allowFileAccess = true
-
-            // Habilita la caché de la app (necesita setAppCachePath)
             cacheMode = WebSettings.LOAD_DEFAULT
-
-            // Nivel de zoom inicial para texto (porcentaje)
             textZoom = 100
-
-            // Modo de zoom, permite control de gestos de zoom
             builtInZoomControls = true
-
-            // Oculta los controles de zoom nativos (aunque el zoom sigue funcionando con gestos)
             displayZoomControls = false
-
-            // Habilita el soporte para zoom
             setSupportZoom(true)
-
-            // Habilita la carga automática de imágenes
             loadsImagesAutomatically = true
-
-            // Habilita o desactiva la carga de contenido mixto (http dentro de https)
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-            // Layout: puede ser NARROW_COLUMNS, NORMAL, SINGLE_COLUMN, TEXT_AUTOSIZING
             layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
-
-            // Define si el contenido puede acceder al clipboard
             mediaPlaybackRequiresUserGesture = false
 
         }

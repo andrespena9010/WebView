@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,37 +24,31 @@ fun WebViewCompose(
 
     val navigation by viewModel.navigation.collectAsStateWithLifecycle()
 
-    Scaffold(
+    Box (
         modifier = Modifier
-            .fillMaxSize()
-    ) { innerPaddings ->
-        Box (
-            modifier = Modifier
-                .padding( innerPaddings )
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ){
 
-            if ( !navigation ){
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(1f)
-                        .pointerInput( Unit ){
-                            detectTapGestures(
-                                onPress = {
-                                    nav.popBackStack()
-                                }
-                            )
-                        }
-                )
-            }
-
-            AndroidView(
-                factory = { ctx ->
-                    viewModel.go( ctx )
-                }
+        if ( !navigation ){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(1f)
+                    .pointerInput( Unit ){
+                        detectTapGestures(
+                            onPress = {
+                                nav.popBackStack()
+                            }
+                        )
+                    }
             )
         }
+
+        AndroidView(
+            factory = { ctx ->
+                viewModel.getWebView( ctx )
+            }
+        )
     }
 }
