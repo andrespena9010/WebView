@@ -40,7 +40,7 @@ fun Navigation() {
 
         composable<Views.WebViewCompose> {
             WebWiewTheme {
-                WebViewCompose(nav = navController)
+                WebViewCompose( navController )
             }
         }
 

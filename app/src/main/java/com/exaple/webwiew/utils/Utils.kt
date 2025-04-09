@@ -1,9 +1,10 @@
 package com.exaple.webwiew.utils
 
 val URLs = listOf(
-    "https://orbys.eu/",
+    "https://orbys.eu/en",
     "https://www.youtube.com/",
     "https://www.weatherapi.com/",
-    "https://cssgridgarden.com/#es",
-    "https://www.whatismybrowser.com/"
+    "https://cssgridgarden.com/",
+    "https://www.whatismybrowser.com/",
+    "https://andrespena9010.github.io/Universo/responsive/"
 )

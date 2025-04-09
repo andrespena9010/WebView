@@ -2,11 +2,15 @@ package com.exaple.webwiew.ui.viewmodels
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
+import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 
 @SuppressLint("StaticFieldLeak")
@@ -15,78 +19,90 @@ open class WebViewModelClass(): ViewModel(){
     private lateinit var webView: WebView
     private lateinit var url: String
 
-    fun setUrl( url: String ){
+    private val _navigation = MutableStateFlow( false )
+    val navigation: StateFlow<Boolean> = _navigation.asStateFlow()
+
+    fun setUrl(
+        url: String,
+        navigation: Boolean
+        ){
+        _navigation.update { navigation }
         this.url = url
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     fun go( context: Context ): WebView {
 
-        /*val width = context.resources.displayMetrics.widthPixels
-        val density = context.resources.displayMetrics.density
-        var fraction = 1f
-
-        if ( density == 2f && width >= 3840 ) fraction = 0.2f*/
-
         webView = WebView( context )
 
+        webView.clearCache(true)
+
         webView.webViewClient = object: WebViewClient(){
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                webView.evaluateJavascript(
+            override fun onLoadResource(view: WebView?, urlResource: String?) {
+                view?.evaluateJavascript(
                     """
-                    (function() {
-                        
-                        var metaViewport = document.querySelector('meta[name="viewport"]');
-    
-                        if (metaViewport) {
-                            metaViewport.setAttribute('content', 'width=1300');
-                        } else {
+                        (function() {
                             metaViewport = document.createElement('meta');
                             metaViewport.name = 'viewport';
-                            metaViewport.content = 'width=1300';
+                            metaViewport.content = 'width=3840, height=2160';
                             document.head.appendChild(metaViewport);
-                        }
-                        
-                    })();
-                    """.trimIndent()
-                    , null
+                        })();
+                        """.trimIndent(),
+                    null
                 )
+                super.onLoadResource(view, urlResource)
             }
         }
 
         webView.settings.apply {
 
-            userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+            // Habilita JavaScript (desactivado por defecto por seguridad)
+            javaScriptEnabled = true
 
-            javaScriptEnabled = true // Habilita JavaScript
-            domStorageEnabled = true // Habilita almacenamiento DOM
-            cacheMode = WebSettings.LOAD_DEFAULT // Usa la caché si está disponible
+            // Usa un viewport "amplio", como un navegador de escritorio. Necesario para que el meta viewport funcione bien
+            useWideViewPort = true
 
-            useWideViewPort = true // Usa un viewport amplio (como un navegador)
-            loadWithOverviewMode = true // Escala el contenido al tamaño del WebView
+            // Ajusta el contenido a la pantalla al cargar la página
+            loadWithOverviewMode = true
 
-            //builtInZoomControls = true // Habilita controles de zoom (pinch)
-            displayZoomControls = false // Oculta los botones de zoom
+            // Permite el almacenamiento DOM (como localStorage)
+            domStorageEnabled = true
 
-            allowFileAccess = true // Permite acceso a archivos locales (¡cuidado con la seguridad!)
-            allowContentAccess = true // Permite acceso a contenido multimedia
+            // Permite el acceso a archivos locales (file:// URLs)
+            allowFileAccess = true
 
-            javaScriptCanOpenWindowsAutomatically = true // Permite ventanas emergentes
-            mediaPlaybackRequiresUserGesture = false // Permite autoplay de audio/video
+            // Habilita la caché de la app (necesita setAppCachePath)
+            cacheMode = WebSettings.LOAD_DEFAULT
 
-            databaseEnabled = true // Habilita almacenamiento tipo base de datos
+            // Nivel de zoom inicial para texto (porcentaje)
+            textZoom = 100
 
-            loadsImagesAutomatically = true // Carga imágenes automáticamente
-            blockNetworkImage = false // No bloquea imágenes cargadas por red
-            blockNetworkLoads = false // No bloquea ningún recurso de red
+            // Modo de zoom, permite control de gestos de zoom
+            builtInZoomControls = true
 
-            //setSupportZoom(true) // Permite hacer zoom
-            setSupportMultipleWindows(false) // No soporta múltiples ventanas (popups)
+            // Oculta los controles de zoom nativos (aunque el zoom sigue funcionando con gestos)
+            displayZoomControls = false
 
-            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW // Permite contenido http dentro de https (si es necesario)
+            // Habilita el soporte para zoom
+            setSupportZoom(true)
+
+            // Habilita la carga automática de imágenes
+            loadsImagesAutomatically = true
+
+            // Habilita o desactiva la carga de contenido mixto (http dentro de https)
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+
+            // Layout: puede ser NARROW_COLUMNS, NORMAL, SINGLE_COLUMN, TEXT_AUTOSIZING
+            layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+
+            // Define si el contenido puede acceder al clipboard
+            mediaPlaybackRequiresUserGesture = false
 
         }
+
+        val cookieManager = CookieManager.getInstance()
+        cookieManager.setAcceptCookie(true)
+        cookieManager.acceptThirdPartyCookies(webView)
 
         webView.loadUrl( url )
 
